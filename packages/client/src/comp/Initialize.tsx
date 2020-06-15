@@ -4,6 +4,7 @@ import { useAppHistory } from '../lib/path'
 import { AnalyticsContainer, FeatureFlagsContainer, VoterContainer, useDeepMemoize } from '../lib/unstated'
 import { initializeAnalytics } from '../lib/analytics'
 import { UTM } from '../common'
+import { watchVH } from '../lib/watchVH'
 
 export const Initialize: React.FC = () => {
   const { oid } = useAppHistory()
@@ -18,6 +19,9 @@ export const Initialize: React.FC = () => {
     utmTerm: query['utm_term'],
     utmContent: query['utm_content'],
   })
+
+  // Keep tracks of the viewport's true height
+  React.useEffect(watchVH, [])
 
   React.useEffect(() => {
     (async () => {
