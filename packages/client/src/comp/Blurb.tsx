@@ -1,5 +1,5 @@
 import React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import { useAppHistory } from '../lib/path'
 import { client } from '../lib/trpc'
 import { AddressContainer } from '../lib/unstated'
@@ -9,16 +9,6 @@ import img2k from './img/blurb_bg_max_width_2k.jpg'
 import img6k from './img/blurb_bg_max_width_6k.jpg'
 import { Button } from 'muicss/react'
 import { toast } from 'react-toastify'
-
-const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`
-
-const bgFadeIn = keyframes`
-  from { background-color: #ffff; }
-  to { background-color: #fff0 }
-`
 
 const Wrapper = styled.div`
   width: 100%;
@@ -43,7 +33,6 @@ const Wrapper = styled.div`
     top: 0;
     z-index: 1;
 
-    animation: ${bgFadeIn} ease 5s 1s both;
   }
   /* Makes subsequent elements above the ::after white filter */
   & > div, & > form {
@@ -110,7 +99,6 @@ const Headline = styled.div`
   font-family: 'Merriweather', serif;
   font-size: 1.3em;
   text-align: center;
-  animation: ${fadeIn} ease 2s both;
 
   @media screen and (min-width: 592px) {
     width: 70%;
@@ -129,7 +117,6 @@ const GetStarted = styled.form`
   width: 100%;
   height: 30%;
   font-family: 'Open Sans', sans;
-  animation: ${fadeIn} ease 2s both;
 
   @media screen and (min-width: 592px) {
     width: 45%;
