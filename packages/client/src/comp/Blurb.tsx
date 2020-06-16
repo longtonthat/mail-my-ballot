@@ -8,6 +8,7 @@ import img1k from './img/blurb_bg_max_width_1k.jpg'
 import img2k from './img/blurb_bg_max_width_2k.jpg'
 import img6k from './img/blurb_bg_max_width_6k.jpg'
 import { Button } from 'muicss/react'
+import { toast } from 'react-toastify'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -228,9 +229,16 @@ export const Blurb: React.FC = () => {
     const zip = zipRef?.current?.value
     if (!zip) return
     const resp = await client.fetchState(zip)
-    if (resp.type === 'error') return
-    pushAddress(resp.data, zip)
-    // TODO: handle error
+    if (resp.type === 'error') {
+      toast(
+`Something wrong happened while querying for your ZIP Code.
+We're sorry this happened, if you try again and the error persists try contacting us.`,
+        {type: 'error'},
+      )
+    } else {
+      pushAddress(resp.data, zip)
+    }
+
   }
 
   const defaultValue = () => {
