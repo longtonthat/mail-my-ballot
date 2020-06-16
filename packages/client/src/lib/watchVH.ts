@@ -30,7 +30,7 @@ export const watchVH = (() => {
     // Because we might toggle the developer tools while developing, and
     // constantly switch dimensions, it's better to always allow highestVH
     // to update in non-production builds
-    if (window.innerHeight > highestVH || process.env.REACT_APP_SHOW_DEV_INFO) {
+    if (window.innerHeight > highestVH || process.env.NODE_ENV !== 'production') {
       highestVH = window.innerHeight
       document.documentElement.style.setProperty(
         "--vh",
