@@ -1,83 +1,226 @@
 import React from 'react'
-import styled from 'styled-components'
-import { RoundedButton } from './util/Button'
-import { StyleContainer } from './util/Container'
+import styled, { keyframes } from 'styled-components'
 import { useAppHistory } from '../lib/path'
 import { client } from '../lib/trpc'
 import { AddressContainer } from '../lib/unstated'
-import { AppForm } from './util/Form'
 
+import img1k from './img/blurb_bg_max_width_1k.jpg'
+import img2k from './img/blurb_bg_max_width_2k.jpg'
+import img6k from './img/blurb_bg_max_width_6k.jpg'
+import { Button } from 'muicss/react'
 
-const Background = styled.div`
-  top: 0;
-  left: 0;
-  min-width: 100%;
-  background: rgb(144,202,249);
-  background: linear-gradient(-45deg, rgba(144,202,249,1) 0%, rgba(30,136,229,1) 25%, rgba(21,101,192,1) 100%);
-  color: #f1f1ff;
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
 `
 
-const Title = styled.h1`
-  font-weight: 100;
-  padding-top: 24px;
-  @media only screen and (max-width: 544px) {
-    padding-top: 8px;
+const bgFadeIn = keyframes`
+  from { background-color: #ffff; }
+  to { background-color: #fff0 }
+`
+
+const Wrapper = styled.div`
+  width: 100%;
+  height: calc(var(--vh) * 100);
+  box-sizing: border-box;
+  position: relative;
+  color: #323232;
+
+  /*
+    Lightens the bg, since backdrop-filters are not yet fully supported
+    on all browsers we create a pseudo-element to fake that effect.
+  */
+  &::before {
+    width: 100%;
+    height: calc(var(--vh) * 100);
+
+    content: '';
+    display: block;
+    background-image: linear-gradient(to bottom right, #fffd, #fffa);
+
+    position: absolute;
+    top: 0;
+    z-index: 1;
+
+    animation: ${bgFadeIn} ease 5s 1s both;
   }
-`
+  /* Makes subsequent elements above the ::after white filter */
+  & > div, & > form {
+    z-index: 2;
+  }
 
-const Text = styled.p`
-  margin-bottom: 16px;
-`
+  /* Loads the background image according to the device's screen dimensions */
+  @media screen and (max-width: 640px) {
+    background-image: url(${img1k});
+    background-size: cover;
+    background-position-x: 64%;
+    background-position-y: 0;
+    /* So the content is centered relative to the space subtracted by the Navbar */
+    padding-top: calc(var(--vh) * 10);
+  }
+  @media screen and (min-width: 641px) {
+    background-image: url(${img1k});
+    background-size: cover;
+    background-position-x: 44%;
+    background-position-y: 0;
+  }
+  @media screen and (min-width: 592px) {
+    /* At this point the navbar changes size */
+    padding-top: calc(var(--vh) * 14);
+  }
+  @media screen and (min-width: 1281px) {
+    background-image: url(${img2k});
+    background-size: 115vw;
+    background-position-x: 74%;
+    background-position-y: 64%;
+  }
+  @media screen and (min-width: 1920px) {
+    background-image: url(${img6k});
+    background-size: 100vw;
+  }
 
-const FlexBox = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-`
 
-const FlexContainer = styled.div`
-  margin-top: 24px;
-  display: flex;
-  flex-direction: row;
-  justify-contnet: flex-start;
-  align-content: center;
-`
+  /*
+    Instead of tweaking individual measurements, we're gonna create a single
+    div with a desired height and set its two elements (Headline & GetStarted)
+    vertically apart from each other with the flex box.
+  */
+  & > .container {
+    height: 50%;
 
-const ZipInput = styled.input`
-  padding: 14px 16px;
-  border: none;
-  box-shadow: none;
-  outline: none;
-  width: 84px;
-  border-radius: 4px;
-  margin-right: 1rem;
-`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
 
-const SubmitButton = styled(RoundedButton)`
-  z-index: 0;
-  background: #4DB6AC;
-  color: #f1f1ff;
-  margin 0;
-  :hover {
-    background: #5DC6BC;
-    color: #f1f1ff;
+    @media screen and (min-width: 592px) {
+      height: 33%;
+      margin-bottom: calc(var(--vh) * 22);
+    }
   }
 `
 
-export const Blurb: React.FC<{}> = () => {
+const Headline = styled.div`
+  width: 80%;
+
+  font-family: 'Merriweather', serif;
+  font-size: 1.3em;
+  text-align: center;
+  animation: ${fadeIn} ease 2s both;
+
+  @media screen and (min-width: 592px) {
+    width: 70%;
+    font-size: 1.7em;
+  }
+  @media screen and (min-width: 1024px) {
+    width: 50%;
+    font-size: 1.5em;
+  }
+  @media screen and (min-width: 1920px) {
+    font-size: 2.3em;
+  }
+`
+
+const GetStarted = styled.form`
+  width: 100%;
+  height: 30%;
+  font-family: 'Open Sans', sans;
+  animation: ${fadeIn} ease 2s both;
+
+  @media screen and (min-width: 592px) {
+    width: 45%;
+  }
+
+  & > p {
+    /* Some browsers might have a predefined rule for these */
+    padding: 0;
+    margin: calc(var(--vh) * 3) 0 calc(var(--vh) * 7);
+
+    font-size: 1.07em;
+    text-align: center;
+
+    @media screen and (min-width: 592px) {
+      margin: calc(var(--vh) * 6) 0;
+    }
+  }
+
+  & > .buttonWrapper {
+    width: 70%;
+    height: calc(var(--vh) * 8);
+
+    margin-left: 15%;
+
+    display: flex;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+
+    > input, > button {
+      box-sizing: border-box;
+      border: none;
+
+      :focus { outline: none; }
+    }
+
+    @media screen and (min-width: 1025px) {
+      width: 50%;
+      margin-left: 25%;
+      height: calc(var(--vh) * 6);
+    }
+  }
+
+  & > .buttonWrapper > input {
+    width: 60%;
+    height: 100%;
+    background-color: white;
+    padding: 5%;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+
+    font-size: 1.04em;
+    ::placeholder {
+      color: #ccc;
+    }
+
+    /* Normalizes webkit autofill customizations */
+    :-webkit-autofill,
+    :-webkit-autofill:hover,
+    :-webkit-autofill:focus {
+      font-size: 1.04em;
+      /* Using background-color won't work here */
+      box-shadow: 0 0 0px 100px white inset;
+    }
+
+    /* Hides increment/decrement arrows on webkit */
+    ::-webkit-inner-spin-button,
+    ::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Hides increment/decrement arrows on Firefox */
+    -moz-appearance: textfield;
+  }
+
+  & > .buttonWrapper > button {
+    width: 40%;
+    height: 100%;
+
+    border-radius: 0 4px 4px 0;
+    margin: 0;
+
+    @media screen and (min-width: 592px) {
+      /* Since the button's width is always related  */
+      font-size: 1vw;
+    }
+  }
+`
+
+export const Blurb: React.FC = () => {
   const { path, pushAddress } = useAppHistory()
   const { address } = AddressContainer.useContainer()
   const zipRef = React.useRef<HTMLInputElement>(null)
-
-  // mobile browsers don't support 100vh, so use this trick instead
-  // https://chanind.github.io/javascript/2019/09/28/avoid-100vh-on-mobile-web.html
-  // Also, need to use a state variable instead of a simpler ts variable
-  // https://stackoverflow.com/a/56156394/8930600
-  const [height, setHeight] = React.useState('100vh')
-  React.useEffect(() => {
-    setHeight(`${window.innerHeight}px`)
-  }, [])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.persist()  // allow async function call
@@ -98,37 +241,30 @@ export const Blurb: React.FC<{}> = () => {
     }
   }
 
-  return <Background style={{height}}>
-    <StyleContainer>
-      <FlexBox style={{height}}>
-        <Title>Vote by Mail</Title>
-        <Text>
-          Voting by mail is a secure, time-tested, and easy way to vote.  Your ballot arrives safely in the mail weeks before the election and can be filled out and returned at your convenience.
-        </Text>
-        <Text>Sign up today in <b>2 minutes</b> before your state deadline expires.
-        </Text>
-        <AppForm onSubmit={handleSubmit}>
-          <Text><b>Enter your ZIP code</b> to get started</Text>
-          <FlexContainer> 
-            {/* id is used by WarningMsg to fill out zipcode */}
-            <ZipInput
-              id='start-zip'
-              data-testid='start-zip'
-              type='text'
-              pattern='[0-9]{5}'
-              placeholder='ZIP code'
-              defaultValue={defaultValue()}
-              ref={zipRef} />
-            <SubmitButton
-              id='start-submit'
-              data-testid='start-submit'
-              variant='raised'
-            >
-              Start
-            </SubmitButton>
-          </FlexContainer>
-        </AppForm>
-      </FlexBox>
-    </StyleContainer>
-  </Background>
+  return <Wrapper>
+    <div className="container">
+      <Headline>MailMyBallot streamlines state vote-by-mail applications by digitizing the voter’s signup process.</Headline>
+      <GetStarted onSubmit={handleSubmit}>
+        <p>Enter your ZIP Code to get started</p>
+        <div className="buttonWrapper">
+          <input
+            type='number'
+            placeholder='Enter ZIP Code'
+            id='start-zip'
+            data-testid='start-zip'
+            pattern='[0-9]{5}'
+            defaultValue={defaultValue()}
+            ref={zipRef}
+          />
+          <Button
+            color='primary'
+            id='start-submit'
+            data-testid='start-submit'
+          >
+            Enter
+          </Button>
+        </div>
+      </GetStarted>
+    </div>
+  </Wrapper>
 }
