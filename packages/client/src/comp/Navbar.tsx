@@ -166,10 +166,10 @@ export const Navbar = () => {
         These are temporary links, once these sections are implemented all
         anchor elements will be replaced with proper Link elements.
       */}
-      <a>Team</a>
-      <a>Get Involved</a>
-      <a>Contact Us</a>
-      <a className="register">Register</a>
+      <a href="#">Team</a>
+      <a href="#">Get Involved</a>
+      <a href="#">Contact Us</a>
+      <a className="register" href="#">Register</a>
     </NavLinks>
   </Wrapper>
 }
